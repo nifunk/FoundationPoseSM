@@ -1,16 +1,19 @@
-# FoundationPoseROS2: Multi-Object Pose Estimation and Tracking of Novel Objects in ROS2 with RealSense2
+# FoundationPoseROSSM: Multi-Object Pose Estimation and Tracking of Novel Objects
+
+This repo is forked from [FoundationPoseROS2](https://github.com/ammar-n-abbas/FoundationPoseROS2). The only difference compared to the original repo is that the interface to query the pose estimation pipeline has been changed from ROS2 to python multiprocessing, making the framework
+more modular and better compatible e.g. also with ROS 1.
 
 <p align="center">
   <img src="assets/demo.gif" alt="Demo Video" width="330">
   <img src="assets/demo_robot.gif" alt="Robot Demo Video" width="434"><br>
 </p>
 
-FoundationPoseROS2 is a ROS2-integrated system for 6D object pose estimation and tracking, based on the FoundationPose architecture. It uses RealSense2 with the Segment Anything Model 2 (SAM2) framework for end-to-end, model-based, real-time pose estimation and tracking of novel objects.
+FoundationPoseSM is a python shared memory-integrated system for 6D object pose estimation and tracking, based on the FoundationPose architecture. It uses RealSense2 with the Segment Anything Model 2 (SAM2) framework for end-to-end, model-based, real-time pose estimation and tracking of novel objects.
 
 It is built on top of [FoundationPose](https://github.com/NVlabs/FoundationPose) and [live-pose](https://github.com/Kaivalya192/live-pose).
 
 The main advantages to the previous repositories and [isaac_ros_foundationpose](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/tree/main/isaac_ros_foundationpose):
-1. ROS2-based real-time framework that works with 8GB GPU, unlike [isaac_ros_foundationpose](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/tree/main/isaac_ros_foundationpose) which requires more than 64GB GPU.
+1. shared--memory based real-time framework that works with 8GB GPU, unlike [isaac_ros_foundationpose](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/tree/main/isaac_ros_foundationpose) which requires more than 64GB GPU.
 2. SAM2-based automatic segmentation of the objects
 3. Multi-object pose estimation and tracking
 4. End-to-end assignment of object models with the segmented masks
@@ -20,7 +23,6 @@ Furthermore, it provides an interactive GUI for object model-to-mask assignment 
 ## Prerequisites
 
 - **Ubuntu**
-- **ROS2**
 - **Minimum 8GB NVIDIA GPU**
 - **CUDA 12.x**
 - **Intel RealSense Camera**
@@ -29,25 +31,6 @@ Furthermore, it provides an interactive GUI for object model-to-mask assignment 
 ## Dependencies
 
 ```bash
-# Install ROS2 on Ubuntu
-sudo apt install ros-<ROS_DISTRO>-desktop
-
-# Install librealsense2
-sudo apt install ros-<ROS_DISTRO>-librealsense2*
-
-# Install debian realsense2 package
-sudo apt install ros-<ROS_DISTRO>-realsense2-*
-
-# Setup CUDA 12.x
-sudo apt-get --purge remove 'nvidia-*'
-sudo apt-get autoremove
-sudo reboot
-
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
-sudo dpkg -i cuda-keyring_1.0-1_all.deb
-sudo apt-get update
-sudo apt-get -y install cuda
-
 # Install Miniconda
 mkdir -p ~/miniconda3
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
@@ -71,8 +54,16 @@ conda create -n foundationpose_ros python=3.10 -y
 # Activate conda environment
 conda activate foundationpose_ros
 ```
-> [!NOTE]
-> Conda environment must be created with the correct Python version according to the ROS2 distribution to ensure compatibility. For example, use Python 3.8 for ROS Foxy and Python 3.10 for ROS Humble.
+
+```bash
+# Installing the correct cuda drivers inside the conda environment
+# https://stackoverflow.com/questions/72684130/how-to-set-the-cuda-path-in-the-conda-environment
+conda env config vars set CUDA_HOME=""
+conda activate foundationpose_ros
+
+# Install CUDA (e.g. 12.1) 
+conda install -c "nvidia/label/cuda-12.1.0" cuda-toolkit -y
+```
 
 ```bash
 # Build extensions
